@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <div th:replace="~{fragment :: meta}"></div>
+
+    <div th:replace="~{fragment :: styles}"></div>
+    <title>クレジットカード登録</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <body>
+      <div class="tabelog-wrapper">
+        <!--ヘッダー-->
+        <div th:replace="~{fragment :: header}"></div>
+
+        <main>
+          <h2 class="text-center">クレジットカードの登録</h2>
+
+        <div class="container pb-5 tabelog-container">
+          <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-8">
+              <form id="payment-form">
+                <div id="card-element"></div>
+                  <button type="submit" id="submit">カードを登録する</button>
+                  <p id="message"></p>
+              </form>
+            </div>
+          </div>
+        </div>
+        </main>
+        <!--フッター-->
+        <div th:replace="~{fragment :: footer}"></div>
+      </div>
+      <!--script-->
+      <div th:replace="~{fragment :: scripts}"></div>
+  <script>
+  const stripe = Stripe("pk_test_51S7tZHAcD2XKA2lmWUqyeZCgn1ZZ8fxsA353QOpQfez1pE6jSUpq1v6RRCYjFLDPEPtPYnPV495eLHfQFZAnPwZu00GaDhAwxD"); // 公開可能キー
+  const elements = stripe.elements();
+  const card = elements.create("card");
+  card.mount("#card-element");
+
+  // CSRFトークン取得
+  const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+  const form = document.getElementById("payment-form");
+  const message = document.getElementById("message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: "card",
+      card: card,
+    });
+
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
+
+    // Spring BootのAPIに送信
+    const response = await fetch("/subscription/save-payment-method", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        [csrfHeader]: csrfToken  // 修正箇所
+      },
+      body: JSON.stringify({ paymentMethodId: paymentMethod.id }),
+    });
+
+    if (response.ok) {
+      message.textContent = "カードを登録しました！";
+    } else {
+      message.textContent = "カード登録に失敗しました。";
+    }
+  });
+</script>
+    </body>
+  </head>
+</html>

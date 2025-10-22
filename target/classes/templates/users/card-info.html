@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <div th:replace="~{fragment :: meta}"></div>
+
+    <div th:replace="~{fragment :: styles}"></div>
+    <title>有料会員登録</title>
+  </head>
+    <body>
+      <div class="tabelog-wrapper">
+        <!--ヘッダー-->
+        <div th:replace="~{fragment :: header}"></div>
+
+        <main>
+          <h2 class="text-center">クレジットカードの情報</h2>
+          <div th:if="${brand}">
+            <p>ブランド:<span th:text="${brand}"></span></p>
+            <p>下4桁：**** <span th:text="${last4}"></span></p>
+            <p>有効期限：<span th:text="${expMonth}"></span>/<span th:text="${expYear}"></span></p>
+            <a th:href="@{/subscription/register-card}">カードを変更する</a>
+          </div>
+          <div th:if="${error}">
+            <p th:text="${error}" style="color:red"></p>
+          </div>
+        </main>
+        <!--フッター-->
+        <div th:replace="~{fragment :: footer}"></div>
+      </div>
+      <!--script-->
+      <div th:replace="~{fragment :: scripts}"></div>
+    </body>
+</html>

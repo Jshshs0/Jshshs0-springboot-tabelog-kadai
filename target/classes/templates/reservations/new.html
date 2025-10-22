@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <div th:replace="~{fragment :: meta}"></div>
+
+    <div th:replace="~{fragment :: styles}"></div>
+    <title>予約ページ</title>
+    <!-- FlatpickrのCSSとJS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  </head>
+  <body>
+    <div class="tabelog-wrapper">
+      <!--ヘッダー-->
+      <div th:replace="~{fragment :: header}"></div>
+
+      <main>
+        <div class="container pb-5 tabelog-container">
+          <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-8">
+              <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                  <li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+                  <li class="breadcrumb-item"><a th:href="@{/stores}">店舗一覧</a></li>
+                  <li class="breadcrumb-item"><a th:href="@{/stores/{id}(id=${store.id})}">店舗詳細</a></li>
+                  <li class="breadcrumb-item"><a th:href="@{/reservations}">予約一覧</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">予約ページ</li>
+                </ol>
+              </nav>
+
+              <h1 class="mb-4 text-center" th:text="${store.getStoreName() + 'の予約'}"></h1>
+              <form method="post" th:action="@{/reservations/{id}(id=${store.id})}" th:object="${reservation}">
+                <div class="form-group row mb-3">
+                  <div class="col-md-5">
+                    <label for="reservationDate" class="col-form-label text-md-left fw-bold">
+                      <div class="d-flex-align-items-center">
+                        <span class="me-1">予約日</span>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="col-md-7">
+                    <div th:if="${#fields.hasErrors('reservationDate')}" th:errors="*{reservationDate}"></div>
+                    <input type="text" id="reservationDate" th:field="*{reservationDate}" placeholder="日付を選択してください。" required>
+                  </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                  <div class="col-md-5">
+                    <label for="reservationTime" class="col-form-label text-md-left fw-bold">
+                      <div class="d-flex-align-items-center">
+                        <span class="me-1">予約時間</span>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="col-md-7">
+                    <div th:if="${#fields.hasErrors('reservationTime')}" th:errors="*{reservationTime}"></div>
+                    <input type="text" id="reservationTime" th:field="*{reservationTime}" placeholder="時間を選択してください。"required>
+                  </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                  <div class="col-md-5">
+                    <label for="numberOfPeople" class="col-form-label text-md-left fw-bold">
+                      <div class="d-flex-align-items-center">
+                        <span class="me-1">予約人数</span>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="col-md-7">
+                    <div th:if="${#fields.hasErrors('numberOfPeople')}" th:errors="*{numberOfPeople}"></div>
+                    <input type="text" th:field="*{numberOfPeople}" placeholder="人数を入力してください。">
+                  </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-center my-4">
+                  <button type="submit" class="btn text-white shadow-sm w-100 tabelog-btn">予約</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+      <!--フッター-->
+      <div th:replace="~{fragment :: footer}"></div>
+    </div>
+    <!--script-->
+    <div th:replace="~{fragment :: scripts}"></div>
+    <script>
+    //日付用Flatpickr
+    flatpickr("#reservationDate", {
+      dateFormat: "Y-m-d",
+      minDate: "today"
+    });
+    //時間用Flatpickr
+    flatpickr("#reservationTime", {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true,
+      minuteIncrement: 15
+    });
+    </script>
+  </body>
+</html>

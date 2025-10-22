@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <div th:replace="~{fragment :: meta}"></div>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <div th:replace="~{fragment :: styles}"></div>
+
+    <title>店舗詳細</title>
+  </head>
+  <body>
+    <div class="tabelog-wrapper">
+      <!--ヘッダー-->
+      <div th:replace="~{fragment :: header}"></div>
+
+      <main>
+        <div class="container pt-4 pb-5 tabelog-container">
+          <div class="row justify-content-center">
+            <div class="col-xxl-9 col-xl-10 col-lg-11">
+              <nav class="mb-4" style="--bs-creadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                  <li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+                  <li class="breadcrumb-item"><a th:href="@{/stores}">店舗一覧</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">店舗詳細</li>
+                </ol>
+              </nav>
+            
+              <div class="d-flex justify-content-center align-items-center mb-4">
+                <h1 class="me-3" th:text="${store.getStoreName()}"></h1>
+				<button sec:authorize="hasRole('ROLE_PREMIUM')" id="favorite-btn" class="btn btn-outline-danger"
+				        th:attr="data-store-id=${store.id},data-is-favorite=${isFavorite}">
+				  <span th:if="${isFavorite}">&#10084;</span>
+				  <span th:unless="${isFavorite}">&#9825;</span>
+				</button>
+              </div>
+
+              <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}"></span>
+              </div>
+
+              <div class="mb-4">
+                <img th:if="${store.getImageName()}" th:src="@{/storage/__${store.getImageName()}__}" class="w-100" alt="店舗画像">
+                <img th:unless="${store.getImageName()}" th:src="@{/images/noImage.png}" class="w-100" alt="NO IMAGE">
+              </div>
+
+              <div class="container">
+                <div class="row">
+                  <div class="col-lg-8 container mb-4">
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">店舗名</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${store.getStoreName()}"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">説明</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${store.getStoreDescription()}"></span>
+                      </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">営業時間</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${#temporals.format(store.getOpenTime, 'HH:mm') + '~' + #temporals.format(store.getCloseTime, 'HH:mm')}"></span>
+                      </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">価格帯</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${store.getPrice() + '円'}"></span>
+                      </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">郵便番号</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${store.getPostalCode()}"></span>
+                      </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">住所</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${store.getAddress()}"></span>
+                      </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                      <div class="col-4">
+                        <span class="fw-bold">電話番号</span>
+                      </div>
+                      <div class="col">
+                        <span th:text="${store.getPhoneNumber()}"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!--無料会員時-->
+            <div sec:authorize="hasRole('ROLE_FREE')">
+              <h2 class="mb-4 text-center">レビュー</h2>
+              <div th:if="${#lists.isEmpty(reviewPage.content)}">
+                <p class="mt-4 mb-4 text-center">まだレビューはありません。</p>
+              </div>
+              <div th:if="${!#lists.isEmpty(reviewPage.content)}" class="row justify-content-center">
+                <div th:each="review : ${reviewPage.content}" class="col-md-6 mt-3 mb-3">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <h2 class="card-title" th:text="${review.user.userName}">ユーザー名</h2>
+                      <h3 class="card-subtitle mb-2 text-muted">
+                        評価:<span th:each="i : ${#numbers.sequence(1, review.rating != null ? review.rating : 0)}">&#9733;</span>
+                            <span th:each="i : ${#numbers.sequence((review.rating != null ? review.rating : 0) + 1, 5)}"
+                                  th:if="${review.rating != null and review.rating < 5}">&#9734;</span>
+                      </h3>
+                      <p class="card-text" th:text="${#dates.format(review.createdAt, 'yyyy年M月d日')}"></p>
+                      <p class="card-text" th:text="${review.comment}">レビュー内容</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                  <ol class="breadcrumb justify-content-center mt-4 mb-0">
+                    <li class="breadcrumb-item"><a th:href="@{/reviews/{id}(id=${store.id})}">すべてのレビューを見る</a></li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+
+            <!--有料会員時-->
+            <div sec:authorize="hasRole('ROLE_PREMIUM')">
+              <h2 class="mb-4 text-center">レビュー</h2>
+              <div class="mb-4 text-center">
+                <a th:href="@{/reviews/{id}/newReview(id=${store.id})}" class="btn tabelog-btn text-white shadow-sm w-25">レビューを投稿する</a>
+                <div th:if="${#lists.isEmpty(reviewPage.content)}">
+                  <p class="mt-4 mb-4 text-center">まだレビューはありません。</p>
+                </div>
+                <div th:if="${!#lists.isEmpty(reviewPage.content)}" class="row justify-content-center">
+                  <div th:each="review :${reviewPage.content}" class="col-md-6 mt-3 mb-3">
+                    <div class="card h-120 position-relative">
+                      <div class="card-body">
+                        <h2 class="card-title" th:text="${review.user.userName}">ユーザー名</h2>
+                        <h3 class="card-subtitle mb-2 text-muted">
+                        評価:<span th:each="i : ${#numbers.sequence(1, review.rating != null ? review.rating : 0)}">&#9733;</span>
+                            <span th:each="i : ${#numbers.sequence((review.rating != null ? review.rating : 0) + 1, 5)}"
+                            th:if="${review.rating != null and review.rating < 5}">&#9734;</span>
+                        </h3>
+                        <p class="card-text" th:text="${#dates.format(review.createdAt, 'yyyy年M月d日')}"></p>
+                        <p class="card-text" th:text="${review.comment}">レビュー内容</p>
+                        <!--ログイン中ユーザーが投稿者なら表示-->
+                        <div th:if="${loginUser != null and loginUser.id == review.user.id}" class="mt-3">
+                          <a th:href="@{/reviews/edit/{id}(id=${review.id})}" class="btn btn-sm btn-outline-primary">編集</a>
+                          <form th:action="@{/reviews/delete/{id}(id=${review.id})}" method="post" th:object="${review}" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('削除しますか？');">削除</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center mt-4 mb-0">
+                      <li class="breadcrumb-item"><a th:href="@{/reviews/{id}(id=${store.id})}">すべてのレビューを見る</a></li>
+                    </ol>
+                  </nav>
+                  <a th:href="@{/reservations/{id}(id=${store.id})}" class="btn tabelog-btn text-white shadow-sm w-25">予約する</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <!--フッター-->
+      <div th:replace="~{fragment :: footer}"></div>
+    </div>
+    <!--script-->
+    <div th:replace="~{fragment :: scripts}"></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('favorite-btn');
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+        btn.addEventListener('click', async () => {
+          const storeId = btn.dataset.storeId;
+          const isFavorite = btn.dataset.isFavorite === 'true';
+
+          const url = isFavorite
+          ? `/favorite/delete/${storeId}`
+          : `/favorite/add/${storeId}`;
+
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest', [csrfHeader] : csrfToken}
+          });
+
+          if(response.ok) {
+            //ハートを切り替える
+            btn.innerHTML = isFavorite ? '&#9825;' : '&#10084';
+            btn.dataset.isFavorite = (!isFavorite).toString();
+          } else {
+            alert('お気に入りの切り替えに失敗しました');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <div th:replace="~{fragment :: meta}"></div>
+
+    <div th:replace="~{fragment :: styles}"></div>
+
+    <title>店舗一覧</title>
+  </head>
+  <body>
+    <div class="tabelog-wrapper">
+      <!--ヘッダー-->
+      <div th:replace="~{fragment :: header}"></div>
+
+      <main>
+        <div class="container tabelog-container pb-5">
+          <div class="row justify-content-center">
+            <nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+              <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+                <li class="breadcrumb-item active" aria-current="page">店舗一覧</li>
+              </ol>
+            </nav>
+
+            <!--店舗情報-->
+            <div class="col">
+              <div class="d-flex justify-content-between flex-wrap">
+
+              </div>
+			  <!--店舗カード-->
+              <div class="row">
+              <div class="col-md-6 mb-4" th:each="store : ${storePage}">
+                <a th:href="@{/stores/__${store.getId()}__}" class="link-dark tabelog-card-link">
+                  <div class="card h-100">
+                    <div class="row g-0">
+                      <div class="col-md-4">
+                        <img th:if="${store.getImageName()}" th:src="@{/storage/__${store.getImageName()}__}" class="card-img-top tabelog-horizontal-card-image" alt="店舗画像">
+                        <img th:unless="${store.getImageName()}" th:src="@{/images/noImage.png}" class="card-img-top tabelog-horizontal-card-image" alt="NO IMAGE">
+                      </div>
+                      <div class="col-md-8">
+                        <div class="card-body">
+                          <h3 class="card-title mb-3" th:text="${store.getStoreName()}"></h3>
+                          <hr class="mb-3">
+                          <p class="card-text mb-2">
+                            <span th:text="${store.getStoreDescription()}"></span>
+                          </p>
+                          <p class="card-text mb-2">
+                            <small class="text-muted" th:text="${'〒' + store.getPostalCode()}"></small>
+                            <small class="text-muted" th:text="${store.getAddress()}"></small>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              </div>
+              <!--ページネーション-->
+              <div th:if="${storePage.getTotalPages() > 1}" class="d-flex justify-content-center">
+                <nav aria-label="店舗一覧ページ">
+                  <ul class="pagination">
+                    <li class="page-item">
+                      <span th:if="${storePage.isFirst()}" class="page-link disabled">前</span>
+                      <a th:unless="${storePage.isFirst()}" th:href="@{/stores(page = ${storePage.getNumber() - 1})}" class="page-link tabelog-page-link">前</a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, storePage.getTotalPages() - 1)}" class="page-item">
+                      <span th:if="${i == storePage.getNumber()}" class="page-link active tabelog-active" th:text="${i + 1}"></span>
+                      <a th:unless="${i == storePage.getNumber()}" th:href="@{/stores(page = ${i})}" class="page-link tabelog-page-link" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item">
+                      <span th:if="${storePage.isLast()}" class="page-link disabled">次</span>
+                      <a th:unless="${storePage.isLast()}" th:href="@{/stores(page = ${storePage.getNumber() + 1})}" class="page-link tabelog-page-link">次</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+      <!--フッター-->
+      <div th:replace="~{fragment :: footer}"></div>
+    </div>
+    <!--script-->
+    <div th:replace="~{fragment :: scripts}"></div>
+  </body>
+</html>

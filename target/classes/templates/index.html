@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="https.//www.thymeleaf.org/extras/spring-security">
+  <head>
+    <div th:replace="~{fragment :: meta}"></div>
+
+    <div th:replace="~{fragment :: styles}"></div>
+    <title>店舗一覧</title>
+  </head>
+  <body>
+    <div class="tabelog-wrapper">
+      <div th:replace="~{fragment :: header}"></div>
+
+      <div class="container pt-4 pb-5 tabelog-container">
+        <div th:if="${param.loggedIn}" class="alert alert-info">
+          ログインしました。
+        </div>
+        <div th:if="${param.loggedOut}" class="alert alert-info">
+          ログアウトしました。
+        </div>
+        <div th:if="${successMessage}" class="alert alert-info">
+          <span th:text="${successMessage}"></span>
+        </div>
+      </div>
+
+      <main>
+      <!--スライドショー-->
+      <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <!--1枚目-->
+          <div class="carousel-item active">
+            <img src="/images/cook1.png" class="d-block w-100 carousel-img" alt="料理１">
+          </div>
+          <!--2枚目-->
+          <div class="carousel-item">
+            <img src="/images/cook2.png" class="d-block w-100 carousel-img" alt="料理２">
+          </div>
+          <!--3枚目-->
+          <div class="carousel-item">
+            <img src="/images/cook3.png" class="d-block w-100 carousel-img" alt="料理３">
+          </div>
+        </div>
+      </div>
+      
+        <div class="container pt-4 pb-5 tabelog-container">
+          <div class="row justify-content-center">
+            <div class="col-xxl-9 col-xl-10 col-lg-11">
+              <!--検索機能-->
+              <h2 class="mb-3">店舗検索</h2>
+              <form method="get" th:action="@{/stores/search}" class="mb-3">
+                <div class="row g-2">
+                  <!--テキストボックス-->
+                  <div class="col-md">
+                    <div class="mb-2">
+                        <label class="form-label">店舗名</label>
+                    </div>
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="店舗名を入力してください">
+                  </div>
+                  <!--セレクトボックス-->
+                  <div class="col-md">
+                    <div class="mb-2">
+                      <label class="form-label">エリア</label>
+                    </div>
+                    <select class="form-select" name="area">
+                      <option value="">エリアを選択</option>
+                      <option value="nakaku">中区</option>
+                    </select>
+                  </div>
+                  <!--セレクトボックス-->
+                  <div class="col-md">
+                    <div class="mb-2">
+                        <label class="form-label">カテゴリ</label>
+                    </div>
+                    <select class="form-select" name="categoryName">
+                        <option value="">カテゴリを選択</option>
+                        <option value="居酒屋">居酒屋</option>
+						<option value="カフェ">カフェ</option>
+						<option value="焼き鳥">焼き鳥</option>
+                    </select>
+                  </div>
+                  <!--セレクトボックス-->
+                  <div class="col-md">
+                    <div class="mb-2">
+                      <label class="form-label">価格帯</label>
+                    </div>
+                    <select class="form-select" name="priceRange">
+                      <option value="">指定なし</option>
+                      <option value="1">~1000円</option>
+                      <option value="2">1000~3000円</option>
+                      <option value="3">3000円以上</option>
+                    </select>
+                  </div>
+                  <!--セレクトボックス-->
+                  <div class="col-md">
+                    <div class="mb-2">
+                      <label class="form-label">評価</label>
+                    </div>
+                    <select class="form-select" name="rating">
+                      <option value="">指定なし</option>
+                      <option value="1">★1以上</option>
+                      <option value="2">★2以上</option>
+                      <option value="3">★3以上</option>
+                      <option value="4">★4以上</option>
+                    </select>
+                  </div>
+                  <!--送信ボタン-->
+                  <div class="col-md-auto d-flex align-items-end">
+                    <button type="submit" class="btn text-white shadow-sm tabelog-btn">検索</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="container pt-4 pb-5 tabelog-container">
+          <div class="row justify-content-center">
+              <!--新規登録の店舗カード-->
+              <h2 class="mb-2">新規登録の店舗</h2>
+                <div class="col-auto" th:each="store : ${latestStores}" style="flex: 0 0 20%;">
+                  <div class="card mb-3 h-100">
+                    <img th:if="${store.getImageName()}" th:src="@{/storage/__${store.getImageName()}__}" class="card-img-top" alt="店舗画像">
+                    <img th:unless="${store.getImageName()}" th:src="@{/images/noImage.png}" class="card-img-top" alt="NO IMAGE">
+                  <div class="card-body">
+                    <h3 class="card-title mb-3" th:text="${store.getStoreName()}"></h3>
+                    <hr class="mb-3">
+                    <p class="card-text mb-2">
+                      <span th:text="${store.getStoreDescription()}"></span>
+                    </p>
+                    <p class="card-text mb-2">
+                      <small class="text-muted" th:text="${'〒' + store.getPostalCode()}"></small>
+                      <br>
+                      <small class="text-muted" th:text="${store.getAddress()}"></small>
+                    </p>
+                    </div>
+                  </div>
+                </div>
+          </div>
+        </div>
+      </main>
+      <!--フッター-->
+      <div th:replace="~{fragment :: footer}"></div>
+    </div>
+    <!--script-->
+    <div th:replace="~{fragment :: scripts}"></div>
+  </body>
+</html>
