@@ -58,16 +58,6 @@
                   <!--セレクトボックス-->
                   <div class="col-md">
                     <div class="mb-2">
-                      <label class="form-label">エリア</label>
-                    </div>
-                    <select class="form-select" name="area">
-                      <option value="">エリアを選択</option>
-                      <option value="nakaku">中区</option>
-                    </select>
-                  </div>
-                  <!--セレクトボックス-->
-                  <div class="col-md">
-                    <div class="mb-2">
                         <label class="form-label">カテゴリ</label>
                     </div>
                     <select class="form-select" name="categoryName">
@@ -89,7 +79,7 @@
                       <option value="3">3000円以上</option>
                     </select>
                   </div>
-                  <!--セレクトボックス-->
+                  <!--セレクトボックス
                   <div class="col-md">
                     <div class="mb-2">
                       <label class="form-label">評価</label>
@@ -101,7 +91,7 @@
                       <option value="3">★3以上</option>
                       <option value="4">★4以上</option>
                     </select>
-                  </div>
+                  </div>-->
                   <!--送信ボタン-->
                   <div class="col-md-auto d-flex align-items-end">
                     <button type="submit" class="btn text-white shadow-sm tabelog-btn">検索</button>
@@ -117,6 +107,7 @@
               <!--新規登録の店舗カード-->
               <h2 class="mb-2">新規登録の店舗</h2>
                 <div class="col-auto" th:each="store : ${latestStores}" style="flex: 0 0 20%;">
+                  <a th:href="@{/stores/__${store.getId()}__}" class="link-dark tabelog-card-link">
                   <div class="card mb-3 h-100">
                     <img th:if="${store.getImageName()}" th:src="@{/storage/__${store.getImageName()}__}" class="card-img-top" alt="店舗画像">
                     <img th:unless="${store.getImageName()}" th:src="@{/images/noImage.png}" class="card-img-top" alt="NO IMAGE">
@@ -133,6 +124,7 @@
                     </p>
                     </div>
                   </div>
+                </a>
                 </div>
           </div>
         </div>
